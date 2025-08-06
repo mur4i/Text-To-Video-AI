@@ -68,25 +68,30 @@ def getVideoSearchQueriesTimed(script,captions_timed):
    
     return None
 
-def call_OpenAI(script,captions_timed):
+def call_OpenAI(script, captions_timed):
     user_content = """Script: {}
-Timed Captions:{}
-""".format(script,"".join(map(str,captions_timed)))
+Timed Captions:{}""".format(script, "".join(map(str, captions_timed)))
     print("Content", user_content)
     
     response = client.chat.completions.create(
-        model= model,
+        model=model,
         temperature=1,
         messages=[
             {"role": "system", "content": prompt},
             {"role": "user", "content": user_content}
         ]
     )
-    
+
     text = response.choices[0].message.content.strip()
-    text = re.sub('\s+', ' ', text)
+
+    # ✅ Ajustes
+    # - Remove apenas espaços extras, não quebras de linha
+    # - Converte contra barra N literal para quebra real
+    text = re.sub(r'[ \t]+', ' ', text)
+    text = text.replace("\\n", "\n")
+
     print("Text", text)
-    log_response(LOG_TYPE_GPT,script,text)
+    log_response(LOG_TYPE_GPT, script, text)
     return text
 
 def merge_empty_intervals(segments):
