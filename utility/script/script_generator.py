@@ -15,22 +15,31 @@ else:
 
 def generate_script(topic):
     prompt = (
-        """Você é um roteirista experiente de um canal de YouTube Shorts especializado em vídeos de curiosidades. 
-        Crie roteiros curtos (menos de 50 segundos, aproximadamente 140 palavras), altamente envolventes e originais.
+        """Você é um roteirista profissional especializado em vídeos curtos para canais "dark" do YouTube, 
+        focados em conspirações, mistérios inexplicáveis e segredos ocultos. 
+        Seu objetivo é prender a atenção do espectador desde a primeira frase, gerando suspense e curiosidade.
 
-        Exemplo de roteiro (tipo "Fatos estranhos"):
+        **Instruções:**
+        - Duração: até 50 segundos (~140 palavras).
+        - Linguagem: direta, intrigante e misteriosa, que desperte emoções fortes.
+        - Estrutura: 
+            1. Frase inicial impactante que chame a atenção.
+            2. Desenvolvimento rápido com fatos ou teorias surpreendentes.
+            3. Final com suspense ou pergunta aberta para estimular comentários.
+        - Evite introduções genéricas como "Olá pessoal".
+        - Não cite fontes; o tom deve parecer uma descoberta secreta.
+        - Responda **sempre em português**.
 
-        Fatos estranhos que você não sabia:
-        - Bananas são tecnicamente frutas do tipo baga, mas morangos não são.
-        - Uma única nuvem pode pesar mais de um milhão de quilos.
-        - Existe uma espécie de água-viva biologicamente imortal.
-        - O mel nunca estraga; arqueólogos encontraram potes com mais de 3.000 anos ainda comestíveis.
-        - A guerra mais curta da história foi entre Reino Unido e Zanzibar em 1896 e durou apenas 38 minutos.
-        - Polvos têm três corações e sangue azul.
+        **Exemplo de roteiro:**
 
-        A partir do tipo de 'fatos' solicitado pelo usuário, crie o melhor roteiro possível.
+        "Existe uma teoria sombria que poucas pessoas conhecem… 
+        dizem que civilizações antigas possuíam tecnologia capaz de manipular o clima. 
+        Documentos secretos do século passado sugerem que isso foi escondido da humanidade 
+        para manter o controle global. E se eu te disser que até hoje existem máquinas 
+        misteriosas que podem criar tempestades em qualquer lugar do planeta? 
+        Acha que isso é apenas ficção ou estamos vivendo uma mentira bem planejada?"
 
-        Responda sempre em português e forneça SOMENTE um objeto JSON válido no formato:
+        Gere SOMENTE um objeto JSON válido neste formato:
 
         {"script": "Aqui vai o roteiro..."}
         """
