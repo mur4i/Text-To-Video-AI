@@ -56,9 +56,11 @@ def generate_video_url(timed_video_searches, video_server, youtube_url=None):
         timed_video_urls = []
         
         if video_server == "youtube" and youtube_url:
-            # Para vídeo do YouTube, usa o mesmo vídeo para todos os segmentos
-            for (t1, t2), _ in timed_video_searches:
-                timed_video_urls.append([[t1, t2], youtube_url])
+            # Para vídeo do YouTube, calculamos o tempo total do vídeo
+            total_start = min(t1 for (t1, t2), _ in timed_video_searches)
+            total_end = max(t2 for (t1, t2), _ in timed_video_searches)
+            # Retornamos apenas um segmento com o tempo total
+            timed_video_urls = [[[total_start, total_end], youtube_url]]
         elif video_server == "pexel":
             used_links = []
             for (t1, t2), search_terms in timed_video_searches:
