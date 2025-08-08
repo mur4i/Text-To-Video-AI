@@ -42,35 +42,45 @@ def get_output_media(audio_file_path, timed_captions, background_video_data, vid
     visual_clips = []
     
     for (t1, t2), video_url in background_video_data:
-        # Se for um vídeo do YouTube
-        if "youtube.com" in video_url or "youtu.be" in video_url:
-            video_filename = download_youtube_video(video_url)
-            if video_filename is None:
-                raise Exception("Failed to download YouTube video")
-            
-            # Create VideoFileClip from the downloaded file
-            video_clip = VideoFileClip(video_filename)
-            
-            # Se o vídeo for menor que o tempo necessário, fazemos loop
-            total_duration = t2 - t1
-            if total_duration > video_clip.duration:
-                video_clip = video_clip.loop(duration=total_duration)
+        try:
+            # Se for um vídeo do YouTube
+            if "youtube.com" in video_url or "youtu.be" in video_url:
+                video_filename = download_youtube_video(video_url)
+                if video_filename is None:
+                    raise Exception("Failed to download YouTube video")
                 
-            video_clip = video_clip.set_start(t1).set_end(t2)
+                print(f"Loading video clip from {video_filename}")
+                # Create VideoFileClip from the downloaded file
+                video_clip = VideoFileClip(video_filename)
+                
+                # Se o vídeo for menor que o tempo necessário, fazemos loop
+                total_duration = t2 - t1
+                if total_duration > video_clip.duration:
+                    video_clip = video_clip.loop(duration=total_duration)
+                    
+                video_clip = video_clip.set_start(t1).set_end(t2)
+                
+                # Depois de criar o clip, podemos remover o arquivo
+                try:
+                    os.remove(video_filename)
+                except Exception as e:
+                    print(f"Warning: Could not remove temporary file {video_filename}: {str(e)}")
+            else:
+                # Download do vídeo do Pexels
+                video_filename = tempfile.NamedTemporaryFile(delete=False).name
+                download_file(video_url, video_filename)
+                video_clip = VideoFileClip(video_filename)
+                video_clip = video_clip.set_start(t1).set_end(t2)
             
-            # Depois de usar o arquivo, podemos removê-lo
-            try:
-                os.remove(video_filename)
-            except:
-                pass
-        else:
-            # Download do vídeo do Pexels
-            video_filename = tempfile.NamedTemporaryFile(delete=False).name
-            download_file(video_url, video_filename)
-            video_clip = VideoFileClip(video_filename)
-            video_clip = video_clip.set_start(t1).set_end(t2)
-        
-        visual_clips.append(video_clip)
+            if video_clip is not None:
+                visual_clips.append(video_clip)
+            else:
+                raise Exception("Failed to create video clip")
+                
+        except Exception as e:
+            print(f"Error processing video segment {t1}-{t2}: {str(e)}")
+            # Se falhar um segmento, tentamos continuar com os outros
+            continue
     
     audio_clips = []
     audio_file_clip = AudioFileClip(audio_file_path)
