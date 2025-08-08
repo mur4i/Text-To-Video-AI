@@ -39,13 +39,21 @@ if __name__ == "__main__":
     print(search_terms)
 
     background_video_urls = None
-    if search_terms is not None:
+    
+    # Se estamos usando YouTube, não precisamos dos search_terms
+    if VIDEO_SERVER == "youtube" and YOUTUBE_URL:
+        # Calculamos o tempo total do vídeo a partir das legendas
+        total_start = min(t1 for (t1, t2), _ in timed_captions)
+        total_end = max(t2 for (t1, t2), _ in timed_captions)
+        background_video_urls = [[[total_start, total_end], YOUTUBE_URL]]
+    # Caso contrário, usamos o processo normal do Pexels
+    elif search_terms is not None:
         background_video_urls = generate_video_url(search_terms, VIDEO_SERVER, YOUTUBE_URL)
         print(background_video_urls)
+        # Só faz o merge se não for YouTube
+        background_video_urls = merge_empty_intervals(background_video_urls)
     else:
         print("No background video")
-
-    background_video_urls = merge_empty_intervals(background_video_urls)
 
     if background_video_urls is not None:
         video = get_output_media(SAMPLE_FILE_NAME, timed_captions, background_video_urls, VIDEO_SERVER)
