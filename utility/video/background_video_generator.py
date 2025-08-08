@@ -52,14 +52,18 @@ def getBestVideo(query_string, orientation_landscape=False, used_vids=[]):
     return None
 
 
-def generate_video_url(timed_video_searches,video_server):
+def generate_video_url(timed_video_searches, video_server, youtube_url=None):
         timed_video_urls = []
-        if video_server == "pexel":
+        
+        if video_server == "youtube" and youtube_url:
+            # Para vídeo do YouTube, usa o mesmo vídeo para todos os segmentos
+            for (t1, t2), _ in timed_video_searches:
+                timed_video_urls.append([[t1, t2], youtube_url])
+        elif video_server == "pexel":
             used_links = []
             for (t1, t2), search_terms in timed_video_searches:
                 url = ""
                 for query in search_terms:
-                  
                     url = getBestVideo(query, orientation_landscape=False, used_vids=used_links)
                     if url:
                         used_links.append(url.split('.hd')[0])

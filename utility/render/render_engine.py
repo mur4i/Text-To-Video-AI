@@ -9,6 +9,7 @@ from moviepy.editor import (AudioFileClip, CompositeVideoClip, CompositeAudioCli
 from moviepy.audio.fx.audio_loop import audio_loop
 from moviepy.audio.fx.audio_normalize import audio_normalize
 import requests
+from utility.video.youtube_downloader import download_youtube_video
 
 def download_file(url, filename):
     with open(filename, 'wb') as f:
@@ -39,15 +40,31 @@ def get_output_media(audio_file_path, timed_captions, background_video_data, vid
         os.environ['IMAGEMAGICK_BINARY'] = '/usr/bin/convert'
     
     visual_clips = []
+    youtube_video_path = None
+    
     for (t1, t2), video_url in background_video_data:
-        # Download the video file
-        video_filename = tempfile.NamedTemporaryFile(delete=False).name
-        download_file(video_url, video_filename)
+        # Se for um vídeo do YouTube
+        if "youtube.com" in video_url or "youtu.be" in video_url:
+            if youtube_video_path is None:
+                youtube_video_path = download_youtube_video(video_url)
+                if youtube_video_path is None:
+                    raise Exception("Failed to download YouTube video")
+            video_filename = youtube_video_path
+        else:
+            # Download do vídeo do Pexels
+            video_filename = tempfile.NamedTemporaryFile(delete=False).name
+            download_file(video_url, video_filename)
         
         # Create VideoFileClip from the downloaded file
         video_clip = VideoFileClip(video_filename)
         video_clip = video_clip.set_start(t1)
         video_clip = video_clip.set_end(t2)
+        
+        # Se for vídeo do YouTube, pode precisar de loop
+        if "youtube.com" in video_url or "youtu.be" in video_url:
+            if t2 - t1 > video_clip.duration:
+                video_clip = video_clip.loop(duration=t2 - t1)
+        
         visual_clips.append(video_clip)
     
     audio_clips = []

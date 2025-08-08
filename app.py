@@ -15,11 +15,17 @@ import argparse
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate a video from a topic.")
     parser.add_argument("topic", type=str, help="The topic for the video")
+    parser.add_argument("--youtube", type=str, help="YouTube video URL to use as background", default=None)
+    parser.add_argument("--video-server", type=str, choices=["pexel", "youtube"], default="pexel", help="Video source to use")
 
     args = parser.parse_args()
     SAMPLE_TOPIC = args.topic
     SAMPLE_FILE_NAME = "audio_tts.wav"
-    VIDEO_SERVER = "pexel"
+    VIDEO_SERVER = args.video_server
+    YOUTUBE_URL = args.youtube
+
+    if VIDEO_SERVER == "youtube" and not YOUTUBE_URL:
+        parser.error("--youtube URL is required when using youtube video server")
 
     response = generate_script(SAMPLE_TOPIC)
     print("script: {}".format(response))
@@ -34,7 +40,7 @@ if __name__ == "__main__":
 
     background_video_urls = None
     if search_terms is not None:
-        background_video_urls = generate_video_url(search_terms, VIDEO_SERVER)
+        background_video_urls = generate_video_url(search_terms, VIDEO_SERVER, YOUTUBE_URL)
         print(background_video_urls)
     else:
         print("No background video")
